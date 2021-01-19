@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+from datetime import timedelta
 
 from configurations import TIMEZONE
 from data_recorder.database.simulator import Simulator
@@ -55,15 +56,21 @@ def test_extract_features() -> None:
     Test case to export *multiple* testing/training data sets for reinforcement learning
     """
     start_time = dt.now(tz=TIMEZONE)
+    
+    start_date = int(dt.now().strftime("%Y%m%d"))
+    end_date = int((dt.now() + timedelta(days=1)).strftime("%Y%m%d"))
+
 
     sim = Simulator()
+
+    
 
     for ccy in ['BTC-USD']:
         # for ccy, ccy2 in [('LTC-USD', 'tLTCUSD')]:
         query = {
             'ccy': [ccy],  # ccy2],  # parameter must be a list
-            'start_date': 20210118,  # parameter format for dates
-            'end_date': 20210119,  # parameter format for dates
+            'start_date': start_date,  # parameter format for dates
+            'end_date': end_date,  # parameter format for dates
         }
         print(f'query: {query}')
         sim.extract_features(query)

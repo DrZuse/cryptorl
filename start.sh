@@ -1,6 +1,6 @@
 #!/bin/sh
 
 service mongodb start
-cd /home/crypto-rl
+cd /home/cryptorl
 pip3 install -e .
-#python3 recorder.py
+python3 recorder.py

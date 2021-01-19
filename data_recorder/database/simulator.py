@@ -268,6 +268,7 @@ class Simulator(object):
             order_book.new_tick(msg=tick)
             continue
 
+        LOGGER.info('end of loop tick_history')
         elapsed = max((dt.now(tz=TIMEZONE) - start_time).seconds, 1)
         LOGGER.info('Completed run_simulation() with %i ticks in %i seconds '
                     'at %i ticks/second'
