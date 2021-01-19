@@ -21,4 +21,4 @@ docker build -t NAME --rm .
 docker build -t cryptorl --rm .
 
 
-test
+test2
