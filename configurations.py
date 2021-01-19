@@ -33,7 +33,7 @@ MAX_BOOK_ROWS = 15
 INCLUDE_ORDERFLOW = True
 
 # ./data_recorder/database/database.py
-BATCH_SIZE = 100000
+BATCH_SIZE = 100
 #RECORD_DATA = False
 #BATCH_SIZE = 100000
 RECORD_DATA = True

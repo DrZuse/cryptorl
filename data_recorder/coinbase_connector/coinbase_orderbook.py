@@ -96,6 +96,7 @@ class CoinbaseOrderBook(OrderBook):
         LOGGER.info('%s: book loaded................in %f seconds' % (self.sym, elapsed))
 
     def new_tick(self, msg: dict) -> bool:
+    #def new_tick(msg: dict) -> bool:
         """
         Method to process incoming ticks.
 

@@ -56,6 +56,7 @@ def get_orderbook_from_symbol(symbol: str) -> \
     :param symbol: instrument name
     :return: order book for 'symbol'
     """
+    LOGGER.info('def get_orderbook_from_symbol')
     return _get_orderbook_from_exchange(exchange=_get_exchange_from_symbol(symbol=symbol))
 
 
@@ -175,39 +176,48 @@ class Simulator(object):
 
         LOGGER.info('querying {}'.format(instrument_name))
 
-        order_book = get_orderbook_from_symbol(symbol=instrument_name)(
-            sym=instrument_name)
+        order_book = get_orderbook_from_symbol(symbol=instrument_name)
 
         start_time = dt.now(tz=TIMEZONE)
         LOGGER.info('Starting get_orderbook_snapshot_history() loop with %i ticks for %s'
                     % (loop_length, query['ccy']))
 
         # loop through all ticks returned from the Arctic Tick Store query.
-        for count, tx in enumerate(tick_history.itertuples()):
+        count = 0
+        for tx in tick_history.itertuples():
+        #for count, tx in enumerate(tick_history.itertuples()):
             #print(f'len: {len(enumerate(tick_history.itertuples()))}')
 
             # convert to dictionary for processing
             tick = tx._asdict()
-            
+            LOGGER.info(f'count: {count} | tx: {tx}')
             # periodically print number of steps completed
             if count % 250000 == 0:
             #if count % BATCH_SIZE == 0: # my
-                print(f'count: {count} | tx: {tx}')
-                print(f'tick: {tick}')
+                
+                LOGGER.info(f'tick: {tick}')
 
                 elapsed = (dt.now(tz=TIMEZONE) - start_time).seconds
                 LOGGER.info('...completed %i loops in %i seconds' % (count, elapsed))
+                
+            count += 1
 
+            LOGGER.info('filter out bad ticks')
             # filter out bad ticks
             if 'type' not in tick:
                 continue
-
+                
+            LOGGER.info('flags for a order book reset')
             # flags for a order book reset
             if tick['type'] in tick_types_for_warm_up:
+                LOGGER.info('before')
+                LOGGER.info(f'tick: {tick}')
                 order_book.new_tick(msg=tick)
+                LOGGER.info('after')
                 continue
 
             # check if the LOB is pre-loaded, if not skip message and do NOT process.
+            LOGGER.info('check if the LOB is pre-loaded, if not skip message and do NOT process.')
             if order_book.done_warming_up is False:
                 LOGGER.info(
                     "{} order book is not done warming up: {}".format(
@@ -215,14 +225,17 @@ class Simulator(object):
                 continue
 
             # timestamp for incoming tick
+            LOGGER.info('timestamp for incoming tick')
             new_tick_time = parse(tick.get('system_time'))
 
             # remove ticks without timestamps (should not exist/happen)
+            LOGGER.info('remove ticks without timestamps (should not exist/happen)')
             if new_tick_time is None:
                 LOGGER.info('No tick time: {}'.format(tick))
                 continue
 
             # initialize the LOB snapshot timer
+            LOGGER.info('initialize the LOB snapshot timer')
             if last_snapshot_time is None:
                 # process first ticks and check if they're stale ticks; if so,
                 # skip to the next loop.
@@ -240,23 +253,28 @@ class Simulator(object):
 
             # calculate the amount of time between the incoming
             #   tick and tick received before that
+            LOGGER.info('tick and tick received before that')
             diff = self._get_microsecond_delta(new_tick_time, last_snapshot_time)
 
             # update the LOB, but do not take a LOB snapshot if the tick time is
             # out of sequence. This occurs when pre-loading a LOB with stale tick
             # times in general.
+            LOGGER.info('update the LOB, but do not take a LOB snapshot')
             if diff == -1:
                 order_book.new_tick(msg=tick)
                 continue
 
             # derive the number of LOB snapshot insertions for the data buffer.
+            LOGGER.info('derive the number of LOB snapshot insertions for the data buffer.')
             multiple = diff // SNAPSHOT_RATE_IN_MICROSECONDS  # 1000000 is 1 second
 
             # proceed if we have one or more insertions to make
+            LOGGER.info('proceed if we have one or more insertions to make')
             if multiple <= 0:
                 order_book.new_tick(msg=tick)
                 continue
-
+                
+            LOGGER.info('order_book_snapshot')
             order_book_snapshot = order_book.render_book()
             for i in range(multiple):
                 last_snapshot_time += timedelta(
@@ -265,7 +283,9 @@ class Simulator(object):
 
             # update order book with most recent tick now, so the snapshots
             # are up to date for the next iteration of the loop.
+            LOGGER.info('update order book with most recent tick now')
             order_book.new_tick(msg=tick)
+            LOGGER.info('pre-end of loop tick_history')
             continue
 
         LOGGER.info('end of loop tick_history')
