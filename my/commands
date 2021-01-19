@@ -1,0 +1,7 @@
+service mongodb start
+cd /home/cryptorl
+pip3 install -e .
+python3 recorder.py
+
+
+python3 data_recorder/tests/test_simulator_my.py

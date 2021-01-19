@@ -1,0 +1,24 @@
+docker run -t -i --rm cryptorl bash
+docker run -t -i -v /home/user/git/cryptorl:/home/cryptorl --rm cryptorl bash
+docker run -t -i -v /home/user/git/cryptorl:/home/cryptorl --network="host" --rm cryptorl bash /home/cryptorl/start.sh
+
+
+подключение к командной строке запущеного контейнера:
+docker exec -it CONTAINER_NAME bash
+docker exec -it $(docker ps -f "ancestor=cryptorl" -q) bash
+
+--rm		Automatically remove the container when it exits
+  -t, --tty                            Allocate a pseudo-TTY
+  -i, --interactive                    Keep STDIN open even if not attached
+  
+## удалить все контейнеры:
+docker container rm $(docker container ls -aq)
+
+## удалить все образы:
+docker rmi $(docker images -aq)
+
+docker build -t NAME --rm .
+docker build -t cryptorl --rm .
+
+
+

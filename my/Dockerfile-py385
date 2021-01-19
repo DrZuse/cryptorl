@@ -1,0 +1,23 @@
+#ubuntu  python3.8.5
+FROM ubuntu:latest
+RUN apt-get update
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata mc
+RUN apt-get install python3 python3-venv python3-wheel python3-pip -y
+
+#RUN pip3 install Keras==2.2.4
+#RUN pip3 install Keras-Applications==1.0.7
+#RUN pip3 install Keras-Preprocessing==1.0.9
+#RUN pip3 install keras-rl==0.4.2
+
+#RUN pip3 install tensorboard==1.13.1
+#RUN pip3 install tensorflow-estimator==1.13.0
+#RUN pip3 install tensorflow-gpu
+
+#RUN pip3 install numpy
+#RUN pip3 install wheel
+
+#RUN cd /home/crypto-rl
+#RUN python3 -m venv ./venv
+#RUN source venv/bin/activate
+#RUN pip3 install Keras==2.2.4 Keras-Applications==1.0.7 Keras-Preprocessing==1.0.9 keras-rl==0.4.2 tensorboard==1.13.1 tensorflow-estimator==1.13.0 tensorflow-gpu==1.13.1
+#RUN pip3 install -e .
